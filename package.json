@@ -1,0 +1,28 @@
+{
+  "name": "soceng-tunnel",
+  "version": "1.0.0",
+  "description": "A basic local tunnel implementation",
+  "main": "dist/index.js",
+  "bin": {
+    "soceng-tunnel": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "start-server": "echo 'Server moved to ~/soceng-ci-tunnel-server. Run: cd ~/soceng-ci-tunnel-server && npm run dev'"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "uuid": "^9.0.1",
+    "ws": "^8.16.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/uuid": "^9.0.7",
+    "@types/ws": "^8.5.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.2"
+  }
+}

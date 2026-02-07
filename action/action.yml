@@ -1,0 +1,46 @@
+name: 'soceng-tunnel'
+description: 'Expose local ports via soceng-tunnel in CI workflows'
+author: 'soceng'
+
+inputs:
+  port:
+    description: 'Local port to expose (required)'
+    required: true
+  server-host:
+    description: 'Tunnel server host'
+    required: false
+    default: 'abbreviated.ai'
+  server-port:
+    description: 'Tunnel server control port'
+    required: false
+    default: '443'
+  api-token:
+    description: 'API token for authentication'
+    required: false
+  subdomain:
+    description: 'Request a specific subdomain'
+    required: false
+  local-host:
+    description: 'Local host to forward to'
+    required: false
+    default: 'localhost'
+  local:
+    description: 'Connect to local tunnel server (localhost:9000) instead of remote'
+    required: false
+    default: 'false'
+
+outputs:
+  tunnel-url:
+    description: 'The public URL of the tunnel'
+  tunnel-id:
+    description: 'The unique tunnel identifier'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
+  post: 'dist/index.js'
+  post-if: 'always()'
+
+branding:
+  icon: 'globe'
+  color: 'blue'

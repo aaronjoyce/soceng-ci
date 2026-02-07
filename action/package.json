@@ -1,0 +1,25 @@
+{
+  "name": "soceng-tunnel-action",
+  "version": "1.0.0",
+  "description": "GitHub Action for soceng-tunnel",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc && ncc build src/main.ts -o dist --source-map --license licenses.txt",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "github-action",
+    "tunnel",
+    "soceng"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^1.10.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@vercel/ncc": "^0.38.1",
+    "typescript": "^5.3.2"
+  }
+}

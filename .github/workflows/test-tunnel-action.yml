@@ -1,0 +1,95 @@
+name: Test Tunnel Action
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'action/**'
+      - '.github/workflows/test-tunnel-action.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build tunnel client
+        run: |
+          npm ci
+          npm run build
+
+      - name: Build action
+        run: |
+          cd action
+          npm ci
+          npm run build
+
+      - name: Start simple HTTP server
+        run: |
+          echo '{"status":"ok","message":"Hello from tunnel test!"}' > /tmp/response.json
+          cd /tmp && python3 -m http.server 3000 &
+          sleep 2
+          # Verify server is running
+          curl -s http://localhost:3000/response.json
+
+      - name: Start tunnel
+        uses: ./action
+        id: tunnel
+        with:
+          port: '3000'
+          server-host: ${{ secrets.TUNNEL_SERVER_HOST }}
+          server-port: ${{ secrets.TUNNEL_SERVER_PORT || '7777' }}
+          api-token: ${{ secrets.TUNNEL_API_TOKEN }}
+
+      - name: Verify tunnel outputs
+        run: |
+          echo "Tunnel URL: ${{ steps.tunnel.outputs.tunnel-url }}"
+          echo "Tunnel ID: ${{ steps.tunnel.outputs.tunnel-id }}"
+          echo "TUNNEL_URL env: $TUNNEL_URL"
+
+          # Verify outputs are set
+          if [ -z "${{ steps.tunnel.outputs.tunnel-url }}" ]; then
+            echo "ERROR: tunnel-url output is empty"
+            exit 1
+          fi
+
+          if [ -z "${{ steps.tunnel.outputs.tunnel-id }}" ]; then
+            echo "ERROR: tunnel-id output is empty"
+            exit 1
+          fi
+
+      - name: Test tunnel connectivity
+        run: |
+          # Give the tunnel a moment to be fully ready
+          sleep 2
+
+          # Test the tunnel URL
+          echo "Testing tunnel at: ${{ steps.tunnel.outputs.tunnel-url }}/response.json"
+          RESPONSE=$(curl -sf "${{ steps.tunnel.outputs.tunnel-url }}/response.json" || echo "CURL_FAILED")
+
+          if [ "$RESPONSE" = "CURL_FAILED" ]; then
+            echo "ERROR: Failed to reach tunnel URL"
+            exit 1
+          fi
+
+          echo "Response: $RESPONSE"
+
+          # Verify response content
+          if echo "$RESPONSE" | grep -q "Hello from tunnel test"; then
+            echo "SUCCESS: Tunnel is working correctly!"
+          else
+            echo "ERROR: Unexpected response from tunnel"
+            exit 1
+          fi
+
+      - name: Run additional test with TUNNEL_URL env var
+        run: |
+          # Use the exported environment variable
+          curl -sf "$TUNNEL_URL/response.json"
+          echo "Environment variable TUNNEL_URL works correctly"

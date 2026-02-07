@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(npm install)",
+      "Bash(npm run build:*)",
+      "Bash(lsof:*)",
+      "Bash(pkill:*)",
+      "Bash(curl:*)",
+      "Bash(xargs kill:*)",
+      "Bash(npm run typecheck:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(gh api:*)"
+    ]
+  }
+}
