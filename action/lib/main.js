@@ -57,6 +57,7 @@ async function startTunnel() {
         const apiToken = core.getInput('api-token');
         const subdomain = core.getInput('subdomain');
         const localHost = core.getInput('local-host') || 'localhost';
+        const useLocal = core.getInput('local') === 'true';
         // Validate port
         const portNum = parseInt(port, 10);
         if (isNaN(portNum) || portNum < 1 || portNum > 65535) {
@@ -78,6 +79,9 @@ async function startTunnel() {
         }
         if (subdomain) {
             args.push('--subdomain', subdomain);
+        }
+        if (useLocal) {
+            args.push('--local');
         }
         // Path to the tunnel CLI (bundled in dist/)
         const tunnelCliPath = path.join(__dirname, '..', '..', 'dist', 'index.js');
